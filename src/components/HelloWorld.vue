@@ -5,8 +5,13 @@ defineProps({
     msg: String,
 })
 
-async function loadStyle() {
-    await import('../dynamic.scss');
+const styles = import.meta.glob('../dynamic*.scss', { query: '?inline' });
+const styleElem = document.createElement('style');
+document.head.appendChild(styleElem);
+
+async function loadStyle(name) {
+    const { default: style } = await styles[`../${name}.scss`]();
+    styleElem.textContent = style;
 }
 
 </script>
@@ -15,7 +20,8 @@ async function loadStyle() {
     <h1>{{ msg }}</h1>
 
     <div class="card">
-        <button type="button" @click="loadStyle">Load SCSS dynamically</button>
+        <button type="button" @click="loadStyle('dynamic')">Load SCSS 1 dynamically</button>
+        <button type="button" @click="loadStyle('dynamic2')">Load SCSS 2 dynamically</button>
         <p>
             Edit
             <code>components/HelloWorld.vue</code> to test HMR
